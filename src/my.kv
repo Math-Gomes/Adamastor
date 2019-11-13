@@ -1,0 +1,101 @@
+<InputWindow>:
+    name: "main"
+    alphabet: alphabet
+    pattern: pattern
+
+    FloatLayout:
+        cols: 1
+
+        FloatLayout:
+            size: root.width, root.height/2
+
+            Image:
+                source: 'img.png'
+                keep_ratio: False
+                allow_stretch: True
+                opacity: 0.95
+                size_hint: .2, .3
+                pos_hint: {'center_x': .5, 'center_y': .75}
+            
+            Label:
+                text: 'A D A M A S T O R'
+                bold: True
+                pos_hint: {'center_x': .5, 'center_y': .55}
+                size_hint: .6, .08
+                font_size: (root.width**2 + root.height**2) / 14**4
+
+            TextInput:
+                cursor_color: (1,1,1,1)
+                hint_text: "Write the alphabet"
+                pos_hint: {'center_x': .5, 'center_y': .44}
+                size_hint: 0.4, 0.06
+                id: alphabet
+                multiline: False
+                font_size: 20
+
+            TextInput:
+                cursor_color: (1,1,1,1)
+                hint_text: 'Write the pattern'
+                pos_hint: {'center_x': .5, 'center_y': .35}
+                size_hint: 0.4, 0.06
+                id: pattern
+                multiline: False
+                font_size: 20
+
+            Button:
+                pos_hint: {'center_x': .5, 'center_y': .2}
+                size_hint: 0.2, 0.05
+                font_size: 15
+                text: "Submit"
+                background_color: rgba("#0081c2")
+                on_release:
+                    root.manager.transition.direction = "right"
+                    root.submitBtn()
+
+<ResultsWindow>:
+    name: "results"
+    alphabet_id: alphabet_id
+    pattern_id: pattern_id
+    mean_id: mean_id
+
+    FloatLayout:
+        cols: 1
+
+        FloatLayout:
+            size: root.width, root.height/2
+            
+            Label:
+                id: alphabet_id
+                text: "Alphabet:"
+                bold: True
+                pos_hint: {'center_x': .5, 'center_y': .85}
+                size_hint: .6, .08
+                font_size: (root.width**2 + root.height**2) / 14**4
+
+            Label:
+                id: pattern_id
+                text: "Pattern:"
+                bold: True
+                pos_hint: {'center_x': .5, 'center_y': .74}
+                size_hint: .6, .08
+                font_size: (root.width**2 + root.height**2) / 14**4
+
+            Label:
+                id: mean_id
+                text: "Mean:"
+                bold: True
+                pos_hint: {'center_x': .5, 'center_y': .63}
+                size_hint: .6, .08
+                font_size: (root.width**2 + root.height**2) / 14**4
+
+            Button:
+                pos_hint: {'center_x': .5, 'center_y': .2}
+                size_hint: 0.2, 0.05
+                font_size: 15
+                text: "Return to Menu"
+                background_color: rgba("#0081c2")
+                on_release:
+                    # root.returnToMenu()
+                    app.root.current = "input"
+                    root.manager.transition.direction = "left"
+
