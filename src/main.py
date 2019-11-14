@@ -43,7 +43,6 @@ class InputWindow(Screen):
             return
 
         if correctSyntax(self.alphabet.text, self.pattern.text):
-            # kmp_ = kmp.kmp(self.pattern.text, self.alphabet.text)
             kmp_ = kmp.kmp(self.pattern_str, self.alphabet_str)
             eqs, v = kmp.equations(kmp_)
             mean = kmp.mean(eqs, v, len(self.alphabet_str))
