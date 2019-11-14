@@ -4,24 +4,31 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import ObjectProperty
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
+from kivy.config import Config
+
+Config.set('kivy','window_icon','img.png')
+
+from inp import parseInputAlphabet, parseInputPattern
 
 import kmp
 
 def showPopup(title, message):
-        pop = Popup(title = title, content = Label(text=message), size_hint = (None, None), size = (400, 400))
-        pop.open()
+    pop = Popup(title = title, content = Label(text = message), size_hint = (None, None), size = (400, 400))
+    pop.open()
 
-def correctSyntax(alphabet, pattern):
-    # TO DO:
-    # Tratamento pra ver se o formato da entrada está correto.
-    # showPopup("Error", "Incorrect syntax.\nSee example below:\nXXXXXXXXXX")
+def correctSyntax(in_alphabet, in_pattern):
+    alphabet, message = parseInputAlphabet(in_alphabet)
 
-    # Tratamento pra ver se os caracteres do padrão fazem parte do alfabeto.
-    for c in pattern:
-        if not c in alphabet:
-            showPopup("Error", "The pattern isn't at the alphabet.")
-            return False
-    return True
+    if alphabet != None:
+        InputWindow.alphabet_str = ''.join(list(map(lambda k: k[0], alphabet)))
+        pattern, message = parseInputPattern(in_pattern, InputWindow.alphabet_str)
+        if pattern != None:
+            InputWindow.pattern_str = pattern
+            return True
+
+    showPopup("Error", message)
+
+    return False
 
 class InputWindow(Screen):
     alphabet = ObjectProperty(None)
@@ -36,9 +43,10 @@ class InputWindow(Screen):
             return
 
         if correctSyntax(self.alphabet.text, self.pattern.text):
-            kmp_ = kmp.kmp(self.pattern.text, self.alphabet.text)
+            # kmp_ = kmp.kmp(self.pattern.text, self.alphabet.text)
+            kmp_ = kmp.kmp(self.pattern_str, self.alphabet_str)
             eqs, v = kmp.equations(kmp_)
-            mean = kmp.mean(eqs, v, len(self.alphabet.text))
+            mean = kmp.mean(eqs, v, len(self.alphabet_str))
 
             ResultsWindow.alphabet = self.alphabet.text
             ResultsWindow.pattern = self.pattern.text
@@ -46,8 +54,6 @@ class InputWindow(Screen):
             ResultsWindow.equations = eqs
 
             sm.current = "results"
-            # print(eq)
-            # self.output.text = str(mean)
             self.reset()
 
     def reset(self):
@@ -64,8 +70,8 @@ class ResultsWindow(Screen):
         sm.current = "input"
 
     def on_enter(self, *args):
-        self.alphabet_id.text = "Alphabet:  { " + ", ".join(self.alphabet) + " }"
-        self.pattern_id.text = "Pattern:  " + self.pattern
+        self.alphabet_id.text = "Alphabet: " + self.alphabet.replace(" ", "")
+        self.pattern_id.text = "Pattern:  " + self.pattern.replace(" ", "")
         self.mean_id.text = "Mean:  " + self.mean
 
 
