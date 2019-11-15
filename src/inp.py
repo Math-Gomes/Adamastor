@@ -7,7 +7,7 @@ def parseInputAlphabet(userInput):
 
     if userInput[0] != '{' and userInput[-1] != '}':
         # print("Erro:", "Não inicia/termina com { }")
-        return None, "Input doesn't start / end with { }"
+        return None, "The alphabet must start and end with { }"
 
     splitInput = findall('\(.*?\)', userInput)
 
@@ -30,14 +30,12 @@ def parseInputAlphabet(userInput):
     return result, None
 
 def parseInputPattern(userInput, alphabet):
-    if alphabet == None:
-        return
 
     userInput = userInput.replace(" ", "")
 
     if userInput[0] != '{' and userInput[-1] != '}':
         # print("Erro:", "Não inicia/termina com { }")
-        return
+        return None, "The pattern should start and end with { }"
 
     pattern = userInput[1:-1]
 
@@ -58,5 +56,6 @@ if __name__ == "__main__":
     if r2:
         print(r2)
 
-# { (c, 0.5), (k, 0.5) }
-# { ckck }
+    # { (c, 0.5), (k, 0.5) }
+    # { ckck }
+    # {(a,0.3), (b, 0.3), (c, 0.2), (d, 0.2)}
