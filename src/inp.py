@@ -11,6 +11,9 @@ def parseInputAlphabet(userInput):
 
     splitInput = findall('\(.*?\)', userInput)
 
+    if splitInput == []:
+        return None, "Syntax error"
+
     for t in splitInput:
         if t.index(',') > 2:
             # print("Erro:", "Caractere inválido =>", "'" + t[1:t.index(',')] + "'")

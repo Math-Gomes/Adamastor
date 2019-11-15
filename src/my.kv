@@ -32,6 +32,21 @@
                 id: alphabet
                 multiline: False
                 font_size: 20
+                write_tab: False
+
+            Button:
+                text: "B"
+                pos_hint: {'center_x': .73, 'center_y': .44}
+                size_hint: 0.04, 0.06
+                font_size: 15
+                background_color: rgba("#0081c2")
+                on_release:
+                    app.root.current = "fileWindow"
+                    root.manager.transition.direction = "left"
+            Image:
+                source: "folder.png"
+                pos_hint: {'center_x': .73, 'center_y': .44}
+                size_hint: 0.04, 0.06
 
             TextInput:
                 # cursor_color: (1,1,1,1)
@@ -41,6 +56,9 @@
                 id: pattern
                 multiline: False
                 font_size: 20
+                on_text_validate:
+                    root.manager.transition.direction = "right"
+                    root.submitBtn()
 
             Button:
                 pos_hint: {'center_x': .5, 'center_y': .2}
@@ -49,7 +67,7 @@
                 text: "Submit"
                 background_color: rgba("#0081c2")
                 on_release:
-                    root.manager.transition.direction = "right"
+                    root.manager.transition.direction = "up"
                     root.submitBtn()
 
 <ResultsWindow>:
@@ -96,5 +114,48 @@
                 background_color: rgba("#0081c2")
                 on_release:
                     root.returnToMenu() # app.root.current = "input"
-                    root.manager.transition.direction = "left"
+                    root.manager.transition.direction = "down"
+
+<FileWindow>:
+    fc: fc
+
+    GridLayout:
+        orientation: 'horizontal'
+        rows: 2
+
+        BoxLayout:
+            size_hint_y: None
+            height: 500
+            FileChooserIconView:
+                id: fc
+                path: root.getPath()
+                filters: ['*.txt']
+                canvas.before:
+                    Color:
+                        rgb: .0, .0, .0
+                    Rectangle:
+                        pos: self.pos 
+                        size: self.size 
+                on_selection: root.select(args) 
+
+        FloatLayout:
+            Button:
+                pos_hint: {'center_x': .35, 'center_y': .4}
+                size_hint: 0.2, 0.3
+                text: "Return to Menu" 
+                background_color: rgba("#0081c2")
+                on_release:
+                    root.manager.transition.direction = "right"
+                    root.back()
+
+            Button:
+                pos_hint: {'center_x': .65, 'center_y': .4}
+                size_hint: 0.2, 0.3
+                text: "Select File"
+                background_color: rgba("#0081c2")
+                on_release:
+                    root.manager.transition.direction = "right"
+                    root.open(fc.path, fc.selection)
+
+
 
