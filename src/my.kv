@@ -1,3 +1,15 @@
+<Tooltip>:
+    size_hint: None, None
+    size: self.texture_size[0]+5, self.texture_size[1]+5
+    color:(0,1,0,1),
+    background:(1,0,0)
+    canvas.before:
+        Color:
+            rgb: 0.2, 0.2, 0.2
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
 <InputWindow>:
     name: "main"
     alphabet: alphabet
@@ -10,7 +22,7 @@
             size: root.width, root.height/2
 
             Image:
-                source: 'img.png'
+                source: 'figs/img.png'
                 keep_ratio: False
                 allow_stretch: True
                 opacity: 0.95
@@ -34,19 +46,13 @@
                 font_size: 20
                 write_tab: False
 
-            Button:
-                text: "B"
+            MyButton:
                 pos_hint: {'center_x': .73, 'center_y': .44}
-                size_hint: 0.04, 0.06
-                font_size: 15
-                background_color: rgba("#000000")
+                size_hint: 0.05, 0.07
+                icon: 'atlas://data/images/defaulttheme/filechooser_folder'
                 on_release:
-                    app.root.current = "fileWindow"
                     root.manager.transition.direction = "left"
-            Image:
-                source: "folder.png"
-                pos_hint: {'center_x': .73, 'center_y': .44}
-                size_hint: 0.04, 0.06
+                    app.root.current = "fileWindow"
 
             TextInput:
                 # cursor_color: (1,1,1,1)
@@ -65,7 +71,8 @@
                 size_hint: 0.2, 0.05
                 font_size: 15
                 text: "Submit"
-                background_color: rgba("#0081c2")
+                background_normal: ''
+                background_color: rgba("#00549D")
                 on_release:
                     root.manager.transition.direction = "up"
                     root.submitBtn()
@@ -111,10 +118,11 @@
                 size_hint: 0.2, 0.05
                 font_size: 15
                 text: "Return to Menu"
-                background_color: rgba("#0081c2")
+                background_normal: ''
+                background_color: rgba("#00549D")
                 on_release:
-                    root.returnToMenu() # app.root.current = "input"
                     root.manager.transition.direction = "down"
+                    root.returnToMenu() # app.root.current = "input"
 
 <FileWindow>:
     fc: fc
@@ -136,14 +144,16 @@
                     Rectangle:
                         pos: self.pos 
                         size: self.size 
-                on_selection: root.select(args) 
+                on_selection:
+                    root.select(args) 
 
         FloatLayout:
             Button:
                 pos_hint: {'center_x': .35, 'center_y': .4}
                 size_hint: 0.2, 0.3
-                text: "Return to Menu" 
-                background_color: rgba("#0081c2")
+                text: "Return to Menu"
+                background_normal: ''
+                background_color: rgba("#00549D")
                 on_release:
                     root.manager.transition.direction = "right"
                     root.back()
@@ -152,10 +162,9 @@
                 pos_hint: {'center_x': .65, 'center_y': .4}
                 size_hint: 0.2, 0.3
                 text: "Select File"
-                background_color: rgba("#0081c2")
+                background_normal: ''
+                background_color: rgba("#00549D")
                 on_release:
                     root.manager.transition.direction = "right"
                     root.open(fc.path, fc.selection)
-
-
 
