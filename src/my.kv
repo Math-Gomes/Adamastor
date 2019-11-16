@@ -1,8 +1,6 @@
 <Tooltip>:
     size_hint: None, None
     size: self.texture_size[0]+5, self.texture_size[1]+5
-    color:(0,1,0,1),
-    background:(1,0,0)
     canvas.before:
         Color:
             rgb: 0.2, 0.2, 0.2
@@ -167,4 +165,3 @@
                 on_release:
                     root.manager.transition.direction = "right"
                     root.open(fc.path, fc.selection)
-
