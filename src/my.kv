@@ -112,6 +112,25 @@
                 font_size: (root.width**2 + root.height**2) / 14**4
 
             Button:
+                pos_hint: {'center_x': .3, 'center_y': .4}
+                size_hint: 0.3, 0.05
+                font_size: 15
+                text: "See Finite State Machine"
+                background_normal: ''
+                background_color: rgba("#00549D")
+                on_release:
+                    root.showFSM()
+
+            Button:
+                pos_hint: {'center_x': .7, 'center_y': .4}
+                size_hint: 0.3, 0.05
+                font_size: 15
+                text: "See Equations"
+                background_normal: ''
+                background_color: rgba("#00549D")
+                on_release:
+                    root.showEquations()
+            Button:
                 pos_hint: {'center_x': .5, 'center_y': .2}
                 size_hint: 0.2, 0.05
                 font_size: 15

@@ -40,7 +40,7 @@ def search(txt, pat):
 
 
 def equations(kmp_t):
-    fsm, m, n = kmp_t
+    fsm, m, n, _ = kmp_t
     z = sym.symbols('z')
     mat = np.array(list(fsm.values()))
 
@@ -61,7 +61,7 @@ def equations(kmp_t):
     for i,s in enumerate(symbs[:-1]):
         eq = sym.Eq(s, eqr[i])
         eqs.append(eq)
-    
+
     eq = sym.Eq(symbs[-1], z*symbs[-2])
     eqs.append(eq)
 

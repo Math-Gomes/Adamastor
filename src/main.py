@@ -4,6 +4,9 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.properties import ObjectProperty
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
+from kivy.uix.button import Button
+from kivy.uix.scrollview import ScrollView
+from kivy.uix.gridlayout import GridLayout
 from kivy.config import Config
 
 Config.set('graphics','resizable', 0)
@@ -21,6 +24,24 @@ import kmp
 from re import findall
 # from kmp_sage import *
 
+def createTransitionsMatrix(fsm, m):
+    matrix = [['-']*(m+1) for _ in range(m)]
+    for c, t in fsm.items():
+        for i, t_ in enumerate(t):
+            matrix[i][t_] = c
+    return matrix
+
+def createStringMatrix(fsm, m):
+    matrix = createTransitionsMatrix(fsm, m)
+    s_matrix = ['         '.join(row) for row in matrix]
+    labels = ['S_' + str(i) for i in range(m+1)]
+    i = 0
+    result = '      ' + '     '.join(labels) + '\n'
+    for row in s_matrix:
+        result += labels[i] + '   ' + row + '\n'
+        i += 1
+    return result[:-1]
+
 def showPopup(title, message):
     pop = Popup(title = title, content = Label(text = message), size_hint = (None, None), size = (400, 200))
     pop.open()
@@ -30,6 +51,7 @@ def correctSyntax(in_alphabet, in_pattern):
 
     if alphabet != None:
         InputWindow.alphabet_str = ''.join(list(map(lambda k: k[0], alphabet)))
+        InputWindow.alphabet_dict = dict(alphabet)
         pattern, message = parseInputPattern(in_pattern, InputWindow.alphabet_str)
         if pattern != None:
             InputWindow.pattern_str = pattern
@@ -70,6 +92,7 @@ class FileWindow(Screen):
 class InputWindow(Screen):
     alphabet = ObjectProperty(None)
     pattern = ObjectProperty(None)
+    alphabet_dict = ObjectProperty(None)
 
     file_content = ["",""]
 
@@ -87,8 +110,8 @@ class InputWindow(Screen):
         if correctSyntax(self.alphabet.text, self.pattern.text):
             # Usando kmp:
             kmp_ = kmp.kmp(self.pattern_str, self.alphabet_str)
-            eqs, v = kmp.equations(kmp_)
-            mean = kmp.mean(eqs, v, len(self.alphabet_str))
+            eqs, v = kmp.equations_(kmp_, self.alphabet_dict)
+            mean = kmp.mean_(eqs, v)
 
             # Usando kmp_sage:
             # kmp_t = kmp(self.pattern_str, self.alphabet_str)
@@ -97,8 +120,9 @@ class InputWindow(Screen):
 
             ResultsWindow.alphabet = self.alphabet.text
             ResultsWindow.pattern = self.pattern.text
-            ResultsWindow.mean = str(mean)
+            ResultsWindow.mean = mean
             ResultsWindow.equations = eqs
+            ResultsWindow.fsm = kmp_[0]
 
             sm.current = "results"
             self.reset()
@@ -112,15 +136,34 @@ class ResultsWindow(Screen):
     pattern = ObjectProperty(None)
     mean = ObjectProperty(None)
     equations = ObjectProperty(None)
+    fsm = ObjectProperty(None)
+
+    def showEquations(self):
+        layout_popup = GridLayout(cols = 1, spacing=2, size_hint_y=None)
+        layout_popup.bind(minimum_height=layout_popup.setter('height'))
+
+        for eq in self.equations:
+            lbl = Label(text = str(eq), size_hint_y = None)
+            layout_popup.add_widget(lbl)
+
+        sv = ScrollView(size_hint=(None, None), size=(675, 400))
+        sv.add_widget(layout_popup)
+        popup = Popup(title='Equations', content=sv, size_hint=(None, None), size = (700,500))
+        popup.open()
+
+    def showFSM(self):
+        message = createStringMatrix(self.fsm, len(self.pattern[1:-1]))
+        pop = Popup(title = "Finite State Machine", content = Label(text = message), size_hint = (None, None), size = (700,500))
+        pop.open()
 
     def returnToMenu(self):
         InputWindow.file_content = ["",""]
         sm.current = "input"
 
     def on_enter(self, *args):
-        self.alphabet_id.text = "Alphabet: " + self.alphabet.replace(" ", "")
-        self.pattern_id.text = "Pattern:  " + self.pattern.replace(" ", "")
-        self.mean_id.text = "Mean:  " + self.mean
+        self.alphabet_id.text = "Alphabet: " + self.alphabet
+        self.pattern_id.text = "Pattern:  " + self.pattern
+        self.mean_id.text = "Mean:  " + "{0:.5f}".format(self.mean)
 
 class Tooltip(Label):
     pass
@@ -133,7 +176,7 @@ class MyButton(ActionButton, Widget):
     #     super(ActionButton, self).__init__(**kwargs)
 
     # def on_mouse_pos(self, *args):
-    #     if not self.get_root_window():
+    #     if not self.get_sv_window():
     #         return
     #     pos = args[1]
     #     self.tooltip.pos = pos
