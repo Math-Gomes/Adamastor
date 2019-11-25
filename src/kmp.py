@@ -120,7 +120,7 @@ def mean_(eqs, z):
     g = g[aux]
 
     g_ = sym.diff(g, z)
-    print(sym.pretty(g_))
+    # print(sym.pretty(g_))
 
     return g_.simplify().subs(z, 1), g_solve
 

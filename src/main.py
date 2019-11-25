@@ -22,14 +22,17 @@ import os
 import kmp
 
 import sympy as sym
+import time
 
 from re import findall
 # from kmp_sage import *
 
+from tabulate import tabulate
+
 def print_output(fsm, m, alphabet, eqs, g, mean):
     matrix = createTransitionsMatrix(fsm, m, alphabet)
     a = dict(parseInputAlphabet(alphabet)[0])
-    f = open("./out/output.txt","w")
+    f = open("./out/output.txt","a")
     string_out = ""
     string_out += "{"
     for i,lines in enumerate(matrix):
@@ -37,6 +40,8 @@ def print_output(fsm, m, alphabet, eqs, g, mean):
         for letter in a:
             if letter in lines:
                 string_out += str(lines.index(letter))+","
+            else:
+                string_out += str(0)+","
         string_out = string_out[0:-1]+'; '
     string_out = string_out[0:-2]+"}, "
     f.write(string_out)
@@ -48,7 +53,12 @@ def print_output(fsm, m, alphabet, eqs, g, mean):
     string_out = string_out[0:-2]+"}, "
     f.write(string_out)
 
-    f.write(str(mean))
+    if mean < 1000000:
+        f.write(str(float(mean)))
+    else:
+        f.write(str(mean))
+
+    f.write("\n\n")
 
 def createTransitionsMatrix(fsm, m, alphabet):
     matrix = [['-']*(m+1) for _ in range(m)]
@@ -135,12 +145,13 @@ class InputWindow(Screen):
 
         if correctSyntax(self.alphabet.text, self.pattern.text):
             # Usando kmp:
+            begin = time.time()
             kmp_ = kmp.kmp(self.pattern_str, self.alphabet_str)
             eqs, v = kmp.equations_(kmp_, self.alphabet_dict)
             mean, g = kmp.mean_(eqs, v)
-
+            end = time.time()
             print_output(kmp_[0], kmp_[1], self.alphabet.text, eqs, g, mean)            
-
+            print('Elapsed time: {0:.2f} seconds'.format(end-begin))
             # Usando kmp_sage:
             # kmp_t = kmp(self.pattern_str, self.alphabet_str)
             # eqs, symbs, z = equations_sage(kmp_t)
@@ -173,7 +184,7 @@ class ResultsWindow(Screen):
         layout_popup.bind(minimum_height=layout_popup.setter('height'))
 
         for eq in self.equations:
-            lbl = Label(text = str(eq.args[0]) + ' = ' + str(eq.args[1]), size_hint_y = None)
+            lbl = Label(text = str(sym.pretty(eq)), size_hint_y = None, font_name="DejaVuSansMono.ttf")
             layout_popup.add_widget(lbl)
 
         sv = ScrollView(size_hint=(None, None), size=(675, 400))
@@ -187,7 +198,7 @@ class ResultsWindow(Screen):
 
         eqs = list(map(lambda x: sym.Eq(x[0],x[1]), self.g.items()))
         for eq in eqs:
-            lbl = Label(text = str(eq.args[0]) + ' = ' + str(eq.args[1])+"\n\n\n", size_hint_y = None)
+            lbl = Label(text = str(sym.pretty(eq))+"\n\n\n", size_hint_y = None, font_name="DejaVuSansMono.ttf")
             layout_popup.add_widget(lbl)
 
         sv = ScrollView(size_hint=(None, None), size=(675, 400))
@@ -196,8 +207,11 @@ class ResultsWindow(Screen):
         popup.open()
 
     def showFSM(self):
-        message = createStringMatrix(self.fsm, len(self.pattern[1:-1]),self.alphabet)
-        pop = Popup(title = "Finite State Machine", content = Label(text = message), size_hint = (None, None), size = (700,500))
+        # message = createStringMatrix(self.fsm, len(self.pattern[1:-1]),self.alphabet)
+        sz = len(self.pattern[1:-1])
+        content = [["S_"+str(i)]+e for i, e in enumerate(createTransitionsMatrix(self.fsm, sz, self.alphabet))]
+        table = tabulate(content, [""]+["S_"+str(i) for i in range(sz+1)], tablefmt = "fancy_grid")
+        pop = Popup(title = "Finite State Machine", content = Label(text = table, font_name="DejaVuSansMono.ttf"), size_hint = (None, None), size = (700,500))
         pop.open()
 
     def returnToMenu(self):
@@ -205,9 +219,12 @@ class ResultsWindow(Screen):
         sm.current = "input"
 
     def on_enter(self, *args):
-        self.alphabet_id.text = "Alphabet: " + self.alphabet
+        # self.alphabet_id.text = "Alphabet: " + self.alphabet
         self.pattern_id.text = "Pattern:  " + self.pattern
-        self.mean_id.text = "Mean:  " + str(self.mean)
+        if self.mean < 1000000:
+            self.mean_id.text = "Mean:  " + str(float(self.mean))
+        else:
+            self.mean_id.text = "Mean:  " + str(self.mean)
 
 class Tooltip(Label):
     pass
@@ -254,4 +271,5 @@ class ADAMASTOR(App):
         return sm
 
 if __name__ == "__main__":
+    f = open("./out/output.txt","w")
     ADAMASTOR().run()

@@ -77,7 +77,7 @@
 
 <ResultsWindow>:
     name: "results"
-    alphabet_id: alphabet_id
+    # alphabet_id: alphabet_id
     pattern_id: pattern_id
     mean_id: mean_id
 
@@ -87,13 +87,15 @@
         FloatLayout:
             size: root.width, root.height/2
             
-            Label:
-                id: alphabet_id
-                text: "Alphabet:"
-                bold: True
-                pos_hint: {'center_x': .5, 'center_y': .85}
-                size_hint: .6, .08
-                font_size: (root.width**2 + root.height**2) / 14**4
+            # ScrollView:
+            #     # pos_hint: {'center_x': .5, 'center_y': .85}
+            #     Label:
+            #         id: alphabet_id
+            #         text: "Alphabet:"
+            #         bold: True
+            #         pos_hint: {'center_x': .5, 'center_y': .85}
+            #         size_hint: .6, .08
+            #         font_size: (root.width**2 + root.height**2) / 14**4
 
             Label:
                 id: pattern_id
