@@ -207,7 +207,7 @@ class ResultsWindow(Screen):
     def on_enter(self, *args):
         self.alphabet_id.text = "Alphabet: " + self.alphabet
         self.pattern_id.text = "Pattern:  " + self.pattern
-        self.mean_id.text = "Mean:  " + "{0:.5f}".format(self.mean)
+        self.mean_id.text = "Mean:  " + str(self.mean)
 
 class Tooltip(Label):
     pass

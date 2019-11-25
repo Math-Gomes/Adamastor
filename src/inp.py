@@ -1,5 +1,6 @@
-from re import findall
+from re import findall, match
 from collections import Counter
+from sympy import Rational
 
 def parseInputAlphabet(userInput):
 
@@ -17,7 +18,11 @@ def parseInputAlphabet(userInput):
         if t.index(',') > 2:
             return None, "Invalid character: " + "'" + t[1:t.index(',')] + "'"
 
-    result = list(map(eval,[f'("{l[1]}",{l[3:-1]})' for l in splitInput]))
+    # for t in splitInput:
+    #     m = match(r'\((\w), ([\d\./]*)\)', t)
+        
+    result = list(map(lambda x: (x.group(1),Rational(x.group(2))),
+                    [match(r'\((\w), ([\d\./]*)\)', l) for l in splitInput]))
 
     characters = ''.join(list(map(lambda k: k[0], result)))
     if Counter(characters).most_common(1)[0][1] > 1:

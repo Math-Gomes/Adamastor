@@ -108,6 +108,7 @@ def mean(eqs, z, alph_size=2):
 
     g = g.subs(z, z/alph_size)
     g_ = sym.diff(g, z)
+    # print(sym.pretty(g_))
 
     return g_.subs(z, 1)
 
@@ -119,6 +120,7 @@ def mean_(eqs, z):
     g = g[aux]
 
     g_ = sym.diff(g, z)
+    print(sym.pretty(g_))
 
     return g_.simplify().subs(z, 1), g_solve
 
@@ -146,9 +148,9 @@ def mean_(eqs, z):
 # print('Média:',mean(eqs,z, kmp_t.alph_size))
 
 if __name__ == "__main__":
-    pat = 'tobeornottob'
+    pat = 'tobeornottobe'
     alph = string.ascii_lowercase
-    prob = {i: 1/26 for i in string.ascii_lowercase}
+    prob = {i: sym.Rational(1,26) for i in string.ascii_lowercase}
     kmp_t = kmp(pat, alph)
     eqs, z = equations_(kmp_t, prob)
     for i in eqs:
