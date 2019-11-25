@@ -23,7 +23,7 @@ def parseInputAlphabet(userInput):
     if Counter(characters).most_common(1)[0][1] > 1:
         return None, "There are repeated characters in the alphabet"
 
-    if sum(map(lambda k: k[1], result)) != 1:
+    if round(sum(map(lambda k: k[1], result)), 2) != 1:
         return None, "The sum of the probabilities of occurrence of characters is different from 1"
 
     return result, None

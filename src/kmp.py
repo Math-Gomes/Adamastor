@@ -2,6 +2,7 @@ from collections import namedtuple
 import sympy as sym
 import numpy as np # A matriz ajudará nas equações
 import string # Possui o alfabeto para ser usado como entrada
+import math
 
 KMP = namedtuple('KMP', 'fsm pat_size alph_size pat')
 
@@ -113,11 +114,13 @@ def mean(eqs, z, alph_size=2):
 def mean_(eqs, z):
     aux,_ = eqs[-1].args
     g = sym.solve(eqs, exclude=[z])
+    g_solve = g
+    # eqs = list(map(lambda x: sym.Eq(x[0],x[1]), g.items()))
     g = g[aux]
 
     g_ = sym.diff(g, z)
 
-    return g_.subs(z, 1)
+    return g_.simplify().subs(z, 1), g_solve
 
 
 # sym.init_printing()
@@ -143,15 +146,15 @@ def mean_(eqs, z):
 # print('Média:',mean(eqs,z, kmp_t.alph_size))
 
 if __name__ == "__main__":
-    pat = 'kkkk'
-    alph = 'ck'
-    prob = {
-        'c':.01,
-        'k':.99,
-    }
+    pat = 'tobeornottob'
+    alph = string.ascii_lowercase
+    prob = {i: 1/26 for i in string.ascii_lowercase}
     kmp_t = kmp(pat, alph)
     eqs, z = equations_(kmp_t, prob)
     for i in eqs:
         s = sym.pretty(i)
         print(s)
-    print('Média:', mean_(eqs,z))
+    
+    media = mean_(eqs,z)[0]
+    print('Média:', media)
+    print('bits', math.log2(media) + 1)

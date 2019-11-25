@@ -21,18 +21,44 @@ from inp import parseInputAlphabet, parseInputPattern
 import os
 import kmp
 
+import sympy as sym
+
 from re import findall
 # from kmp_sage import *
 
-def createTransitionsMatrix(fsm, m):
+def print_output(fsm, m, alphabet, eqs, g, mean):
+    matrix = createTransitionsMatrix(fsm, m, alphabet)
+    a = dict(parseInputAlphabet(alphabet)[0])
+    f = open("./out/output.txt","w")
+    string_out = ""
+    string_out += "{"
+    for i,lines in enumerate(matrix):
+        string_out += str(i)+":"
+        for letter in a:
+            if letter in lines:
+                string_out += str(lines.index(letter))+","
+        string_out = string_out[0:-1]+'; '
+    string_out = string_out[0:-2]+"}, "
+    f.write(string_out)
+
+    string_out = ""
+    string_out += "{"
+    for e in g:
+        string_out += str(e)[2]+"="+str(g[e])+", "
+    string_out = string_out[0:-2]+"}, "
+    f.write(string_out)
+
+    f.write(str(mean))
+
+def createTransitionsMatrix(fsm, m, alphabet):
     matrix = [['-']*(m+1) for _ in range(m)]
     for c, t in fsm.items():
         for i, t_ in enumerate(t):
             matrix[i][t_] = c
     return matrix
 
-def createStringMatrix(fsm, m):
-    matrix = createTransitionsMatrix(fsm, m)
+def createStringMatrix(fsm, m, alphabet):
+    matrix = createTransitionsMatrix(fsm, m, alphabet)
     s_matrix = ['         '.join(row) for row in matrix]
     labels = ['S_' + str(i) for i in range(m+1)]
     i = 0
@@ -111,7 +137,9 @@ class InputWindow(Screen):
             # Usando kmp:
             kmp_ = kmp.kmp(self.pattern_str, self.alphabet_str)
             eqs, v = kmp.equations_(kmp_, self.alphabet_dict)
-            mean = kmp.mean_(eqs, v)
+            mean, g = kmp.mean_(eqs, v)
+
+            print_output(kmp_[0], kmp_[1], self.alphabet.text, eqs, g, mean)            
 
             # Usando kmp_sage:
             # kmp_t = kmp(self.pattern_str, self.alphabet_str)
@@ -123,6 +151,7 @@ class InputWindow(Screen):
             ResultsWindow.mean = mean
             ResultsWindow.equations = eqs
             ResultsWindow.fsm = kmp_[0]
+            ResultsWindow.g = g
 
             sm.current = "results"
             self.reset()
@@ -137,13 +166,14 @@ class ResultsWindow(Screen):
     mean = ObjectProperty(None)
     equations = ObjectProperty(None)
     fsm = ObjectProperty(None)
+    g = ObjectProperty(None)
 
     def showEquations(self):
         layout_popup = GridLayout(cols = 1, spacing=2, size_hint_y=None)
         layout_popup.bind(minimum_height=layout_popup.setter('height'))
 
         for eq in self.equations:
-            lbl = Label(text = str(eq), size_hint_y = None)
+            lbl = Label(text = str(eq.args[0]) + ' = ' + str(eq.args[1]), size_hint_y = None)
             layout_popup.add_widget(lbl)
 
         sv = ScrollView(size_hint=(None, None), size=(675, 400))
@@ -151,8 +181,22 @@ class ResultsWindow(Screen):
         popup = Popup(title='Equations', content=sv, size_hint=(None, None), size = (700,500))
         popup.open()
 
+    def showSolvedEquations(self):
+        layout_popup = GridLayout(cols = 1, spacing=2, size_hint_y=None)
+        layout_popup.bind(minimum_height=layout_popup.setter('height'))
+
+        eqs = list(map(lambda x: sym.Eq(x[0],x[1]), self.g.items()))
+        for eq in eqs:
+            lbl = Label(text = str(eq.args[0]) + ' = ' + str(eq.args[1])+"\n\n\n", size_hint_y = None)
+            layout_popup.add_widget(lbl)
+
+        sv = ScrollView(size_hint=(None, None), size=(675, 400))
+        sv.add_widget(layout_popup)
+        popup = Popup(title='Solved Equations', content=sv, size_hint=(None, None), size = (700,500))
+        popup.open()
+
     def showFSM(self):
-        message = createStringMatrix(self.fsm, len(self.pattern[1:-1]))
+        message = createStringMatrix(self.fsm, len(self.pattern[1:-1]),self.alphabet)
         pop = Popup(title = "Finite State Machine", content = Label(text = message), size_hint = (None, None), size = (700,500))
         pop.open()
 
