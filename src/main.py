@@ -64,19 +64,11 @@ def createTransitionsMatrix(fsm, m, alphabet):
     matrix = [['-']*(m+1) for _ in range(m)]
     for c, t in fsm.items():
         for i, t_ in enumerate(t):
-            matrix[i][t_] = c
+            if matrix[i][t_] != '-':
+                matrix[i][t_] += ','+c
+            else:
+                matrix[i][t_] = c
     return matrix
-
-def createStringMatrix(fsm, m, alphabet):
-    matrix = createTransitionsMatrix(fsm, m, alphabet)
-    s_matrix = ['         '.join(row) for row in matrix]
-    labels = ['S_' + str(i) for i in range(m+1)]
-    i = 0
-    result = '      ' + '     '.join(labels) + '\n'
-    for row in s_matrix:
-        result += labels[i] + '   ' + row + '\n'
-        i += 1
-    return result[:-1]
 
 def showPopup(title, message):
     pop = Popup(title = title, content = Label(text = message), size_hint = (None, None), size = (400, 200))
@@ -210,7 +202,11 @@ class ResultsWindow(Screen):
         # message = createStringMatrix(self.fsm, len(self.pattern[1:-1]),self.alphabet)
         sz = len(self.pattern[1:-1])
         content = [["S_"+str(i)]+e for i, e in enumerate(createTransitionsMatrix(self.fsm, sz, self.alphabet))]
-        table = tabulate(content, [""]+["S_"+str(i) for i in range(sz+1)], tablefmt = "fancy_grid")
+        table = tabulate(content, [""]+["S_"+str(i) for i in range(sz+1)], tablefmt = "psql")
+
+        with open('./out/fsm.txt', 'w') as f:
+            f.write(table+'\n\n')
+
         pop = Popup(title = "Finite State Machine", content = Label(text = table, font_name="DejaVuSansMono.ttf"), size_hint = (None, None), size = (700,500))
         pop.open()
 
@@ -220,7 +216,7 @@ class ResultsWindow(Screen):
 
     def on_enter(self, *args):
         # self.alphabet_id.text = "Alphabet: " + self.alphabet
-        self.pattern_id.text = "Pattern:  " + self.pattern
+        self.pattern_id.text = "Pattern:  " + self.pattern[1:-1]
         if self.mean < 1000000:
             self.mean_id.text = "Mean:  " + str(float(self.mean))
         else:
@@ -271,5 +267,5 @@ class ADAMASTOR(App):
         return sm
 
 if __name__ == "__main__":
-    f = open("./out/output.txt","w")
+    f0 = open("./out/output.txt","w")
     ADAMASTOR().run()
