@@ -91,7 +91,7 @@ def correctSyntax(in_alphabet, in_pattern):
 class FileWindow(Screen):
     def getPath(self):
         return os.path.realpath(__file__)
-sympy==1.4
+
     def open(self, path, filename):
         if(filename == []):
             showPopup("Error","No file selected")
@@ -199,7 +199,7 @@ class ResultsWindow(Screen):
         content = [["S_"+str(i)]+e for i, e in enumerate(createTransitionsMatrix(self.fsm, sz, self.alphabet))]
         table = tabulate(content, [""]+["S_"+str(i) for i in range(sz+1)], tablefmt = "psql")
 
-        with open('./out/fsm.txt', 'w') as f:
+        with open('./out/fsm.txt', 'a') as f:
             f.write(table+'\n\n')
 
         pop = Popup(title = "Finite State Machine", content = Label(text = table, font_name="DejaVuSansMono.ttf"), size_hint = (None, None), size = (700,500))
@@ -238,4 +238,5 @@ class ADAMASTOR(App):
 
 if __name__ == "__main__":
     f0 = open("./out/output.txt","w")
+    f1 = open("./out/fsm.txt","w")
     ADAMASTOR().run()

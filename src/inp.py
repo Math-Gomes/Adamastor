@@ -4,8 +4,16 @@ from sympy import Rational
 
 def parseInputAlphabet(userInput):
 
+
     if userInput[0] != '{' or userInput[-1] != '}':
         return None, "The alphabet must start and end with { }"
+
+    m = match(r'\{ *(\w+) *\}', userInput)
+    if m is not None:
+        alphabet = m.group(1)
+        n = len(alphabet)
+        result = [(i, Rational(1, n)) for i in alphabet]
+        return result, None
 
     userInput = '{' + userInput[1:-1].strip() + '}'
 
