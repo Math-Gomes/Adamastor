@@ -19,5 +19,9 @@ o alfabeto e padrão.
 
 A pasta in contém exemplos de entrada para o programa.
 
+A pasta out contém os arquivos fsm.txt e output.txt:
+    fsm.txt: Contém a matriz correspondente as transições do autômato.
+    output.txt: Contém a saída especificada em aula.
+
 Para executar:
     python3 main.py
