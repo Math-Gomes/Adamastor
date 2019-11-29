@@ -25,7 +25,6 @@ import sympy as sym
 import time
 
 from re import findall
-# from kmp_sage import *
 
 from tabulate import tabulate
 
@@ -92,7 +91,7 @@ def correctSyntax(in_alphabet, in_pattern):
 class FileWindow(Screen):
     def getPath(self):
         return os.path.realpath(__file__)
-
+sympy==1.4
     def open(self, path, filename):
         if(filename == []):
             showPopup("Error","No file selected")
@@ -142,12 +141,9 @@ class InputWindow(Screen):
             eqs, v = kmp.equations_(kmp_, self.alphabet_dict)
             mean, g = kmp.mean_(eqs, v)
             end = time.time()
+
             print_output(kmp_[0], kmp_[1], self.alphabet.text, eqs, g, mean)            
             print('Elapsed time: {0:.2f} seconds'.format(end-begin))
-            # Usando kmp_sage:
-            # kmp_t = kmp(self.pattern_str, self.alphabet_str)
-            # eqs, symbs, z = equations_sage(kmp_t)
-            # mean = mean_sage(eqs, symbs, z, kmp_t.alph_size)
 
             ResultsWindow.alphabet = self.alphabet.text
             ResultsWindow.pattern = self.pattern.text
@@ -199,7 +195,6 @@ class ResultsWindow(Screen):
         popup.open()
 
     def showFSM(self):
-        # message = createStringMatrix(self.fsm, len(self.pattern[1:-1]),self.alphabet)
         sz = len(self.pattern[1:-1])
         content = [["S_"+str(i)]+e for i, e in enumerate(createTransitionsMatrix(self.fsm, sz, self.alphabet))]
         table = tabulate(content, [""]+["S_"+str(i) for i in range(sz+1)], tablefmt = "psql")
@@ -215,38 +210,13 @@ class ResultsWindow(Screen):
         sm.current = "input"
 
     def on_enter(self, *args):
-        # self.alphabet_id.text = "Alphabet: " + self.alphabet
         self.pattern_id.text = "Pattern:  " + self.pattern[1:-1]
         if self.mean < 1000000:
             self.mean_id.text = "Mean:  " + str(float(self.mean))
         else:
             self.mean_id.text = "Mean:  " + str(self.mean)
 
-class Tooltip(Label):
-    pass
-
 class MyButton(ActionButton, Widget):
-    # tooltip = Tooltip(text = 'Hello world')
-
-    # def __init__(self, **kwargs):
-    #     Window.bind(mouse_pos=self.on_mouse_pos)
-    #     super(ActionButton, self).__init__(**kwargs)
-
-    # def on_mouse_pos(self, *args):
-    #     if not self.get_sv_window():
-    #         return
-    #     pos = args[1]
-    #     self.tooltip.pos = pos
-    #     Clock.unschedule(self.display_tooltip) # cancel scheduled event since I moved the cursor
-    #     self.close_tooltip() # close if it's opened
-    #     if self.collide_point(*self.to_widget(*pos)):
-    #         Clock.schedule_once(self.display_tooltip, 1)
-
-    # def close_tooltip(self, *args):
-    #     Window.remove_widget(self.tooltip)
-
-    # def display_tooltip(self, *args):
-    #     Window.add_widget(self.tooltip)
     pass
 
 class WindowManager(ScreenManager):

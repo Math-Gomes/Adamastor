@@ -4,7 +4,7 @@ from sympy import Rational
 
 def parseInputAlphabet(userInput):
 
-    if userInput[0] != '{' and userInput[-1] != '}':
+    if userInput[0] != '{' or userInput[-1] != '}':
         return None, "The alphabet must start and end with { }"
 
     userInput = '{' + userInput[1:-1].strip() + '}'
@@ -18,11 +18,8 @@ def parseInputAlphabet(userInput):
         if t.index(',') > 2:
             return None, "Invalid character: " + "'" + t[1:t.index(',')] + "'"
 
-    # for t in splitInput:
-    #     m = match(r'\((\w), ([\d\./]*)\)', t)
-        
     result = list(map(lambda x: (x.group(1),Rational(x.group(2))),
-                    [match(r'\((\w), ([\d\./]*)\)', l) for l in splitInput]))
+                    [match(r'\((\w), *([\d\./]+)\)', l) for l in splitInput]))
 
     characters = ''.join(list(map(lambda k: k[0], result)))
     if Counter(characters).most_common(1)[0][1] > 1:
@@ -35,7 +32,7 @@ def parseInputAlphabet(userInput):
 
 def parseInputPattern(userInput, alphabet):
 
-    if userInput[0] != '{' and userInput[-1] != '}':
+    if userInput[0] != '{' or userInput[-1] != '}':
         return None, "The pattern should start and end with { }"
 
     pattern = userInput[1:-1]

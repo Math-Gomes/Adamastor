@@ -8,10 +8,6 @@ KMP = namedtuple('KMP', 'fsm pat_size alph_size pat')
 
 def kmp(pat, alphabet=None):
     alphabet = list(alphabet or set(pat))
-    # if not alphabet:
-    #     alphabet = list(set(pat))
-    # else:
-    #     alphabet = list(alphabet)
     m = len(pat)
 
     fsm = {c:[0]*m for c in alphabet}
@@ -39,35 +35,6 @@ def search(txt, pat):
 
     return -1
 
-
-def equations(kmp_t):
-    fsm, m, n, _ = kmp_t
-    z = sym.symbols('z')
-    mat = np.array(list(fsm.values()))
-
-    #Cria as variáveis simbólicas para cada estado do autômato
-    symbs = [sym.symbols('S_'+str(i)) for i in range(m+1)]
-##    for i in range(m+1):
-##        sym_name = sym.symbols('S_'+str(i))
-##        symbs.append(sym_name)
-
-    eqr = [0]*m
-    eqr[0] = 1
-    for j,k in enumerate(mat.T):
-        counts = np.bincount(k, minlength=m+1)
-        for i in range(m):
-            eqr[i] += counts[i]*z*symbs[j]
-
-    eqs = []
-    for i,s in enumerate(symbs[:-1]):
-        eq = sym.Eq(s, eqr[i])
-        eqs.append(eq)
-
-    eq = sym.Eq(symbs[-1], z*symbs[-2])
-    eqs.append(eq)
-
-    return eqs, z
-
 def equations_(kmp_t, prob_dict):
     fsm, m, n,_ = kmp_t
     z = sym.symbols('z')
@@ -76,16 +43,9 @@ def equations_(kmp_t, prob_dict):
 
     #Cria as variáveis simbólicas para cada estado do autômato
     symbs = [sym.symbols('S_'+str(i)) for i in range(m+1)]
-##    for i in range(m+1):
-##        sym_name = sym.symbols('S_'+str(i))
-##        symbs.append(sym_name)
 
     eqr = [0]*m
     eqr[0] = 1
-    # for j,k in enumerate(mat.T):
-    #     counts = np.bincount(k, minlength=m+1)
-    #     for i in range(m):
-    #         eqr[i] += counts[i]*z*symbs[j]
     for i,_ in enumerate(symbs[:-1]):
         pos = np.where(mat == i)
         for row,col in zip(*pos):
@@ -101,62 +61,12 @@ def equations_(kmp_t, prob_dict):
 
     return eqs, z
 
-def mean(eqs, z, alph_size=2):
-    aux,_ = eqs[-1].args
-    g = sym.solve(eqs, exclude=[z])
-    g = g[aux]
-
-    g = g.subs(z, z/alph_size)
-    g_ = sym.diff(g, z)
-    # print(sym.pretty(g_))
-
-    return g_.subs(z, 1)
-
 def mean_(eqs, z):
     aux,_ = eqs[-1].args
     g = sym.solve(eqs, exclude=[z])
     g_solve = g
-    # eqs = list(map(lambda x: sym.Eq(x[0],x[1]), g.items()))
     g = g[aux]
 
     g_ = sym.diff(g, z)
-    # print(sym.pretty(g_))
 
     return g_.simplify().subs(z, 1), g_solve
-
-
-# sym.init_printing()
-
-# pat = 'tobeornottobe'
-# ##alph = "".join([chr(i) for i in range(ord('a'), ord('z')+1)])
-# alph = string.ascii_lowercase
-
-# print(pat, alph)
-
-# kmp_t = kmp(pat, alph)
-# #print(fms)
-# eqs, z = equations(kmp_t)
-# for i in eqs:
-#     s = sym.pretty(i)
-#     print(s)
-
-
-# # for i in eqs:
-# #     j,k = i.args
-# #     print(j, '=', k, ', ', end='')
-
-# print('Média:',mean(eqs,z, kmp_t.alph_size))
-
-if __name__ == "__main__":
-    pat = 'tobeornottobe'
-    alph = string.ascii_lowercase
-    prob = {i: sym.Rational(1,26) for i in string.ascii_lowercase}
-    kmp_t = kmp(pat, alph)
-    eqs, z = equations_(kmp_t, prob)
-    for i in eqs:
-        s = sym.pretty(i)
-        print(s)
-    
-    media = mean_(eqs,z)[0]
-    print('Média:', media)
-    print('bits', math.log2(media) + 1)
